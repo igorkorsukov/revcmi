@@ -586,6 +586,13 @@ void ApplyClientNetPackVisitor::visitSetAvailableCreatures(SetAvailableCreatures
 	callInterfaceIfPresent(cl, p, &IGameEventsReceiver::availableCreaturesChanged, dw);
 }
 
+void ApplyClientNetPackVisitor::visitSetDwellingUpgraded(SetDwellingUpgraded & pack)
+{
+	const CGDwelling * dw = static_cast<const CGDwelling*>(cl.gameInfo().getObj(pack.tid));
+
+	callInterfaceIfPresent(cl, dw->tempOwner, &IGameEventsReceiver::availableCreaturesChanged, dw);
+}
+
 void ApplyClientNetPackVisitor::visitSetHeroesInTown(SetHeroesInTown & pack)
 {
 	const CGTownInstance * t = gs.getTown(pack.tid);

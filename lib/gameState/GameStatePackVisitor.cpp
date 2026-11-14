@@ -596,6 +596,14 @@ void GameStatePackVisitor::visitSetAvailableCreatures(SetAvailableCreatures & pa
 	dw->creatures = pack.creatures;
 }
 
+void GameStatePackVisitor::visitSetDwellingUpgraded(SetDwellingUpgraded & pack)
+{
+	auto * dw = dynamic_cast<CGDwelling *>(gs.getObjInstance(pack.tid));
+	assert(dw);
+	dw->creatures = pack.creatures;
+	dw->upgraded = true;
+}
+
 void GameStatePackVisitor::visitSetHeroesInTown(SetHeroesInTown & pack)
 {
 	CGTownInstance *t = gs.getTown(pack.tid);

@@ -63,10 +63,11 @@ enum class ESerializationVersion : int32_t
 	REWARDABLE_EXTENSIONS_2, // movement points limiter for rewardables
 	BONUS_TRIGGER, // bonus that allows triggered effects in combat
 	CUSTOM_GARRISON_TITLE, // GarrisonDialog pack now has custom title parameter
+	DWELLING_UPGRADE, // dwellings can be upgraded for resources
 
 	RELEASE_170 = HOTA_MAP_STACK_COUNT,
 	RELEASE_174 = CUSTOM_GARRISON_TITLE,
-	CURRENT = CUSTOM_GARRISON_TITLE,
+	CURRENT = DWELLING_UPGRADE,
 };
 
 static_assert(ESerializationVersion::MINIMAL <= ESerializationVersion::CURRENT, "Invalid serialization version definition!");

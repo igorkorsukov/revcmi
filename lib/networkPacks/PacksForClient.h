@@ -766,6 +766,20 @@ struct DLL_LINKAGE SetAvailableCreatures : public CPackForClient
 	}
 };
 
+struct DLL_LINKAGE SetDwellingUpgraded : public CPackForClient
+{
+	ObjectInstanceID tid;
+	std::vector<std::pair<ui32, std::vector<CreatureID> > > creatures;
+
+	void visitTyped(ICPackVisitor & visitor) override;
+
+	template <typename Handler> void serialize(Handler & h)
+	{
+		h & tid;
+		h & creatures;
+	}
+};
+
 struct DLL_LINKAGE SetHeroesInTown : public CPackForClient
 {
 	ObjectInstanceID tid; //id of town

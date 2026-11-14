@@ -57,8 +57,76 @@ void DwellingInstanceConstructor::initTypeData(const JsonNode & input)
 	bannedForRandomDwelling = input["bannedForRandomDwelling"].Bool();
 	kingdomOverviewImage = AnimationPath::fromJson(input["kingdomOverviewImage"]);
 
+	if (!input["upgrade"].isNull())
+	{
+		// Note: resource identifiers are resolved asynchronously, so upgrade cost
+		// can not be validated here - it is checked later, on demand
+		upgradeCost.resolveFromJson(input["upgrade"]["cost"]);
+	}
+
 	for (const auto & mapTemplate : getTemplates())
 		onTemplateAdded(mapTemplate);
+}
+
+const ResourceSet & DwellingInstanceConstructor::getUpgradeCost() const
+{
+	return upgradeCost;
+}
+
+std::vector<std::vector<CreatureID>> DwellingInstanceConstructor::getUpgradedCreatures() const
+{
+	std::vector<std::vector<CreatureID>> result;
+
+	if (upgradeCost.empty())
+		return result;
+
+	// Upgraded creatures are taken from the creature upgrade graph, e.g. griffin -> royalGriffin.
+	// Creatures without any upgrade are kept as is, so that dwellings like Golem Factory
+	// (where not every creature has an upgrade) still can be upgraded.
+	bool anyChange = false;
+
+	for (const auto & level : availableCreatures)
+	{
+		std::vector<CreatureID> upgradedLevel;
+
+		for (const CCreature * creature : level)
+		{
+			if (!creature)
+				return {}; // creature identifiers are not resolved yet
+
+			CreatureID upgradedId = creature->getId();
+
+			if (!creature->upgrades.empty())
+			{
+				upgradedId = *creature->upgrades.begin();
+
+				if (upgradedId != creature->getId())
+					anyChange = true;
+			}
+
+			// Dwelling may already provide both base and upgraded creature on the same level
+			if (!vstd::contains(upgradedLevel, upgradedId))
+				upgradedLevel.push_back(upgradedId);
+		}
+
+		if (upgradedLevel.size() != level.size())
+			anyChange = true;
+		else
+		{
+			for (size_t i = 0; i < level.size(); i++)
+			{
+				if (upgradedLevel[i] != level[i]->getId())
+					anyChange = true;
+			}
+		}
+
+		result.push_back(std::move(upgradedLevel));
+	}
+
+	if (!anyChange)
+		return {};
+
+	return result;
 }
 
 void DwellingInstanceConstructor::onTemplateAdded(const std::shared_ptr<const ObjectTemplate> mapTemplate)

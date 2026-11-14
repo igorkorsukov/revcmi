@@ -44,6 +44,8 @@ set(test_SRCS
 		map/CMapFormatTest.cpp
 		map/MapComparer.cpp
 
+		mapObjects/DwellingUpgradeTest.cpp
+
 		netpacks/NetPackFixture.cpp
 
 		spells/AbilityCasterTest.cpp

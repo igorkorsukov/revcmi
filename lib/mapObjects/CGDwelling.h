@@ -14,6 +14,8 @@
 
 #include "army/CArmedInstance.h"
 
+#include "../ResourceSet.h"
+
 VCMI_LIB_NAMESPACE_BEGIN
 
 class CGDwelling;
@@ -40,6 +42,9 @@ public:
 	std::optional<CGDwellingRandomizationInfo> randomizationInfo; //random dwelling options; not serialized
 	TCreaturesSet creatures; //creatures[level] -> <vector of alternative ids (base creature and upgrades, creatures amount>
 
+	/// True if this dwelling was already upgraded to produce upgraded creatures
+	bool upgraded = false;
+
 	CGDwelling(IGameInfoCallback *cb, BonusNodeType nodeType);
 	CGDwelling(IGameInfoCallback *cb);
 	~CGDwelling() override;
@@ -48,6 +53,15 @@ public:
 	ResourceSet dailyIncome() const override;
 	std::vector<CreatureID> providedCreatures() const override;
 	AnimationPath getKingdomOverviewImage() const;
+
+	/// Returns true if this dwelling instance was already upgraded
+	bool isUpgraded() const;
+	/// Returns true if this dwelling can be upgraded right now (has upgrade config and was not upgraded yet)
+	bool canBeUpgraded() const;
+	/// Returns resources required to upgrade this dwelling (empty set if upgrade is not possible)
+	ResourceSet getUpgradeCost() const;
+	/// Returns creatures of a dwelling after upgrade. Empty if upgrade is not possible
+	std::vector<std::vector<CreatureID>> getUpgradedCreatures() const;
 
 protected:
 	void serializeJsonOptions(JsonSerializeFormat & handler) override;
@@ -74,6 +88,8 @@ public:
 	{
 		h & static_cast<CArmedInstance&>(*this);
 		h & creatures;
+		if (h.hasFeature(Handler::Version::DWELLING_UPGRADE))
+			h & upgraded;
 	}
 };
 

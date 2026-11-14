@@ -230,6 +230,7 @@ public:
 	bool buySecSkill( const IMarket *m, const CGHeroInstance *h, SecondarySkill skill);
 	bool garrisonSwap(ObjectInstanceID tid);
 	bool upgradeCreature( ObjectInstanceID objid, SlotID pos, CreatureID upgID );
+	bool upgradeDwelling(ObjectInstanceID dwellingID, PlayerColor player);
 	bool recruitCreatures(ObjectInstanceID objid, ObjectInstanceID dst, CreatureID crid, int32_t cram, int32_t level, PlayerColor player);
 	bool buildStructure(ObjectInstanceID tid, BuildingID bid, bool force=false);//force - for events: no cost, no checkings
 	bool visitTownBuilding(ObjectInstanceID tid, BuildingID bid);
