@@ -11,6 +11,7 @@
 // EntryPoint.cpp : Defines the entry point for the console application.
 
 #include "StdInc.h"
+#include "EntryPoint.h"
 #include "../Global.h"
 
 #include "../client/ClientCommandManager.h"
@@ -116,13 +117,7 @@ static void prog_help(const po::options_description &opts)
 	std::cout << opts;
 }
 
-#if defined(VCMI_WINDOWS) && !defined(__GNUC__) && defined(VCMI_WITH_DEBUG_CONSOLE)
-int wmain(int argc, wchar_t* argv[])
-#elif defined(VCMI_MOBILE)
-int SDL_main(int argc, char *argv[])
-#else
-int main(int argc, char * argv[])
-#endif
+int vcmiclientMain(int argc, char * argv[])
 {
 #ifdef VCMI_ANDROID
 	CAndroidVMHelper::initClassloader(SDL_AndroidGetJNIEnv());
