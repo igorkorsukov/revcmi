@@ -1,0 +1,9 @@
+# Build directories of the top-level wrapper project (see CMakePresets.json)
+/build/
+/build-*/
+
+# CMake user-specific files
+/CMakeUserPresets.json
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json

@@ -52,14 +52,14 @@ if(WIN32)
 	set(VCMI_ORIGINAL_FILENAME "VCMI_client.exe")
 	set(VCMI_ICON_RESOURCE "IDI_ICON1 ICON \"${CMAKE_CURRENT_SOURCE_DIR}/icons/vcmi.ico\"")
 	set(client_VERSIONINFO_RC "${CMAKE_CURRENT_BINARY_DIR}/VCMI_client_versioninfo.rc")
-	configure_file("${CMAKE_SOURCE_DIR}/win/WindowsFileInfo.rc.in" "${client_VERSIONINFO_RC}" @ONLY)
+	configure_file("${VCMI_SOURCE_DIR}/win/WindowsFileInfo.rc.in" "${client_VERSIONINFO_RC}" @ONLY)
 	target_sources(vcmiclient PRIVATE "${client_VERSIONINFO_RC}")
 	set_target_properties(vcmiclient
 		PROPERTIES
 			OUTPUT_NAME "VCMI_client"
 			PROJECT_LABEL "VCMI_client"
 	)
-	set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT vcmiclient)
+	set_property(DIRECTORY ${VCMI_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT vcmiclient)
 	if(NOT ENABLE_DEBUG_CONSOLE)
 		set_target_properties(vcmiclient PROPERTIES WIN32_EXECUTABLE)
 		target_link_libraries(vcmiclient SDL2::SDL2main)
@@ -96,7 +96,7 @@ if(IOS)
 		COMMAND ${CMAKE_COMMAND} --install "${CMAKE_BINARY_DIR}" --component "${CMAKE_INSTALL_DEFAULT_COMPONENT_NAME}" --config "$<CONFIG>" --prefix "$<TARGET_BUNDLE_CONTENT_DIR:vcmiclient>"
 		COMMAND ios/rpath_remove_symlinks.sh
 		COMMAND ios/codesign.sh
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		WORKING_DIRECTORY ${VCMI_SOURCE_DIR}
 	)
 	install(TARGETS vcmiclient DESTINATION Payload COMPONENT app) # for ipa generation with cpack
 elseif(ANDROID)

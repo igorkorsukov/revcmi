@@ -1,0 +1,57 @@
+{
+    "version": 2,
+    "configurePresets": [
+        {
+            "name": "ninja-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}/install"
+            }
+        },
+        {
+            "name": "clang-base",
+            "hidden": true,
+            "inherits": "ninja-base",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "clang-base-configure",
+            "hidden": true,
+            "inherits": "clang-base",
+            "cacheVariables": {
+                "ENABLE_TEST": "OFF",
+                "ENABLE_STRICT_COMPILATION": "OFF",
+                "ENABLE_GOLDMASTER": "OFF",
+                "ENABLE_PCH" : "OFF",
+                "ENABLE_VIDEO" : "OFF",
+                "ENABLE_LAUNCHER" : "OFF",
+                "ENABLE_EDITOR" : "OFF",
+                "ENABLE_ERM" : "OFF",
+                "ENABLE_LUA" : "OFF",
+                "ENABLE_MMAI" : "OFF",
+                "ENABLE_LOBBY" : "OFF"
+            }
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Clang Debug",
+            "inherits": "clang-base-configure",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Clang Release",
+            "inherits": "clang-base-configure",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ]
+}

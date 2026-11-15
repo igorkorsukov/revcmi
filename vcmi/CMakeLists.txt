@@ -4,6 +4,19 @@
 cmake_minimum_required(VERSION 3.16.0)
 
 project(VCMI)
+
+# This project can be either the top-level one (standalone VCMI checkout) or a subproject
+# of a wrapper project located in a parent directory, in which case the top-level
+# CMakeLists.txt defines VCMI_SOURCE_DIR for us.
+# Inside this project always use VCMI_SOURCE_DIR instead of CMAKE_SOURCE_DIR
+# (which points to the wrapper directory) and instead of CMAKE_HOME_DIRECTORY.
+if(NOT DEFINED VCMI_SOURCE_DIR)
+	set(VCMI_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+endif()
+
+# CMAKE_PROJECT_NAME refers to the very first project() call, which is not ours when
+# this project is built as part of a wrapper project. Packaging needs the real name.
+set(VCMI_PROJECT_NAME "${PROJECT_NAME}")
 # TODO
 # - Cleanup remove_directory copy_directory if performance will be a problem.
 # We can use some macro over copy_if_different since it's only work for single file.
@@ -219,7 +232,7 @@ endif()
 set(PACKAGE_NAME_SUFFIX "" CACHE STRING "Suffix for CPack package name")
 set(PACKAGE_FILE_NAME "" CACHE STRING "Override for CPack package filename")
 
-set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmake_modules ${PROJECT_SOURCE_DIR}/CI)
+set(CMAKE_MODULE_PATH ${VCMI_SOURCE_DIR}/cmake_modules ${VCMI_SOURCE_DIR}/CI)
 # Contains custom functions and macros, but don't altering any options
 
 include(VCMIUtils)
@@ -245,9 +258,12 @@ define_property(
 
 # Generate Version.cpp
 if(ENABLE_GITVERSION)
+	# Version.cmake writes Version.cpp into its working directory, which must be
+	# CMAKE_BINARY_DIR since that is where lib/CMakeLists.txt expects it
 	add_custom_target(update_version ALL
-		BYPRODUCTS "Version.cpp"
-		COMMAND ${CMAKE_COMMAND} -DGIT_SHA1="${GIT_SHA1}" -P "${PROJECT_SOURCE_DIR}/cmake_modules/Version.cmake"
+		BYPRODUCTS "${CMAKE_BINARY_DIR}/Version.cpp"
+		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+		COMMAND ${CMAKE_COMMAND} -DGIT_SHA1="${GIT_SHA1}" -P "${VCMI_SOURCE_DIR}/cmake_modules/Version.cmake"
 	)
 else()
 	add_definitions(-DVCMI_NO_EXTRA_VERSION)
@@ -620,7 +636,7 @@ elseif(APPLE)
 		set(DATA_DIR "." CACHE STRING "Where to install data files")
 	else()
 		if(MACOS)
-			set(APP_BUNDLE_DIR "${CMAKE_PROJECT_NAME}.app")
+			set(APP_BUNDLE_DIR "${VCMI_PROJECT_NAME}.app")
 			set(APP_BUNDLE_CONTENTS_DIR "${APP_BUNDLE_DIR}/Contents")
 			set(APP_BUNDLE_BINARY_DIR "${APP_BUNDLE_CONTENTS_DIR}/MacOS")
 			set(APP_BUNDLE_RESOURCES_DIR "${APP_BUNDLE_CONTENTS_DIR}/Resources")
@@ -641,7 +657,7 @@ elseif(ANDROID)
 	string(JSON ANDROID_SYSROOT_LIB_SUBDIR GET "${ndkAbiInfo}" "${ANDROID_ABI}" "triple")
 
 	# required by Qt
-	set(androidPackageSourceDir "${CMAKE_SOURCE_DIR}/android")
+	set(androidPackageSourceDir "${VCMI_SOURCE_DIR}/android")
 	set(androidQtBuildDir "${CMAKE_BINARY_DIR}/android-build")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${androidQtBuildDir}/${LIB_DIR}")
 else()
@@ -759,7 +775,7 @@ vcmi_install_conan_deps()
 
 if(ANDROID)
 	string(REPLACE ";" "\n" ANDROID_GRADLE_PROPERTIES_MULTILINE "${ANDROID_GRADLE_PROPERTIES}")
-	file(WRITE "${androidPackageSourceDir}/vcmi-app/gradle.properties" "signingRoot=${CMAKE_SOURCE_DIR}/CI/android\n${ANDROID_GRADLE_PROPERTIES_MULTILINE}")
+	file(WRITE "${androidPackageSourceDir}/vcmi-app/gradle.properties" "signingRoot=${VCMI_SOURCE_DIR}/CI/android\n${ANDROID_GRADLE_PROPERTIES_MULTILINE}")
 
 	if(ANDROID_STL MATCHES "_shared$")
 		set(stlLibName "${CMAKE_SHARED_LIBRARY_PREFIX}${ANDROID_STL}${CMAKE_SHARED_LIBRARY_SUFFIX}")
@@ -820,7 +836,7 @@ if(WIN32)
 	# Note: due to NSI script generation process all of the backward slashes here are useful
 	set(CPACK_GENERATOR ZIP)
 	set(CPACK_MONOLITHIC_INSTALL 1)
-	set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/license.txt")
+	set(CPACK_RESOURCE_FILE_LICENSE "${VCMI_SOURCE_DIR}/license.txt")
 	set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 	if("${PACKAGE_NAME_SUFFIX}" STREQUAL "")
 		set(CPACK_NSIS_PACKAGE_NAME "VCMI ${CPACK_PACKAGE_VERSION}")
@@ -855,7 +871,7 @@ if(WIN32)
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/clientapp/icons\\\\vcmi.ico")
 	set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/clientapp/icons\\\\vcmi.ico")
 	# set the package header icon for MUI
-	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/clientapp/icons\\\\vcmi.ico")
+	set(CPACK_PACKAGE_ICON "${VCMI_SOURCE_DIR}/clientapp/icons\\\\vcmi.ico")
 
 	set(CPACK_NSIS_MENU_LINKS "http://vcmi.eu/" "VCMI Web Site")
 
@@ -873,7 +889,7 @@ if(WIN32)
 elseif(MACOS AND NOT ENABLE_MONOLITHIC_INSTALL)
 	set(CPACK_MONOLITHIC_INSTALL 1)
 	set(CPACK_GENERATOR "DragNDrop")
-	set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_SOURCE_DIR}/osx/dmg_background.png")
+	set(CPACK_DMG_BACKGROUND_IMAGE "${VCMI_SOURCE_DIR}/osx/dmg_background.png")
 	# Workaround for this issue:
 	# CPack Error: Error executing: /usr/bin/hdiutil detach "/Volumes/VCMI"
 	# https://github.com/actions/runner-images/issues/7522#issuecomment-1564467252
@@ -882,20 +898,20 @@ elseif(MACOS AND NOT ENABLE_MONOLITHIC_INSTALL)
 	endif()
 	# CMake code for CPACK_DMG_DS_STORE executed before DS_STORE_SETUP_SCRIPT
 	# So we can keep both enabled and this shouldn't hurt
-	# set(CPACK_DMG_DS_STORE "${CMAKE_SOURCE_DIR}/osx/dmg_DS_Store")
-	set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_SOURCE_DIR}/osx/DS_Store_Setup.scpt")
+	# set(CPACK_DMG_DS_STORE "${VCMI_SOURCE_DIR}/osx/dmg_DS_Store")
+	set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${VCMI_SOURCE_DIR}/osx/DS_Store_Setup.scpt")
 
 	# Always use "VCMI" as volume name so full path will be /Volumes/VCMI/
 	# Otherwise DMG background image wouldn't work
 	# Pre-generated DS_Store use absolute path to background image
-	set(CPACK_DMG_VOLUME_NAME "${CMAKE_PROJECT_NAME}")
+	set(CPACK_DMG_VOLUME_NAME "${VCMI_PROJECT_NAME}")
 
 	include(GetGitRevisionDescription)
 	get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 	string(TIMESTAMP CURRENT_YEAR "%Y")
 
-	set(MACOSX_BUNDLE_NAME "${CMAKE_PROJECT_NAME}")
-	set(MACOSX_BUNDLE_BUNDLE_NAME "${CMAKE_PROJECT_NAME}")
+	set(MACOSX_BUNDLE_NAME "${VCMI_PROJECT_NAME}")
+	set(MACOSX_BUNDLE_BUNDLE_NAME "${VCMI_PROJECT_NAME}")
 	set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2007-${CURRENT_YEAR} VCMI team")
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "eu.vcmi.vcmi")
 	set(MACOSX_BUNDLE_BUNDLE_VERSION ${GIT_SHA1})
@@ -907,10 +923,10 @@ elseif(MACOS AND NOT ENABLE_MONOLITHIC_INSTALL)
 	endif()
 	set(MACOSX_BUNDLE_ICON_FILE "vcmi.icns")
 
-	install(FILES "${CMAKE_SOURCE_DIR}/osx/vcmi.icns" DESTINATION ${APP_BUNDLE_RESOURCES_DIR})
+	install(FILES "${VCMI_SOURCE_DIR}/osx/vcmi.icns" DESTINATION ${APP_BUNDLE_RESOURCES_DIR})
 
 	set(infoPlist "${CMAKE_BINARY_DIR}/Info.plist")
-	configure_file("${CMAKE_SOURCE_DIR}/osx/Info.plist.in" ${infoPlist})
+	configure_file("${VCMI_SOURCE_DIR}/osx/Info.plist.in" ${infoPlist})
 	if(CMAKE_OSX_DEPLOYMENT_TARGET)
 		set(deploymentTargetPlistKey ":LSMinimumSystemVersion")
 		execute_process(COMMAND
@@ -931,7 +947,7 @@ elseif(IOS)
 	set(CPACK_GENERATOR ZIP)
 	set(CPACK_ARCHIVE_FILE_EXTENSION ipa)
 	set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-	set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};${CMAKE_PROJECT_NAME};app;/")
+	set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};${VCMI_PROJECT_NAME};app;/")
 else()
 	set(CPACK_GENERATOR TGZ)
 endif()

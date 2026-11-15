@@ -523,7 +523,7 @@ if(WIN32)
 			OUTPUT_NAME "VCMI_vcmiclientcommon"
 			PROJECT_LABEL "VCMI_vcmiclientcommon"
 	)
-	set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT vcmiclientcommon)
+	set_property(DIRECTORY ${VCMI_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT vcmiclientcommon)
 	if(NOT ENABLE_DEBUG_CONSOLE)
 		target_link_libraries(vcmiclientcommon SDL2::SDL2main)
 	endif()

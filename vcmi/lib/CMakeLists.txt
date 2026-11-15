@@ -891,8 +891,8 @@ endif()
 
 target_include_directories(vcmi
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-	PUBLIC ${CMAKE_SOURCE_DIR}
-	PUBLIC ${CMAKE_SOURCE_DIR}/include
+	PUBLIC ${VCMI_SOURCE_DIR}
+	PUBLIC ${VCMI_SOURCE_DIR}/include
 )
 
 if(WIN32)
@@ -900,7 +900,7 @@ if(WIN32)
 	set(VCMI_ORIGINAL_FILENAME "VCMI_lib.dll")
 	set(VCMI_ICON_RESOURCE "")
 	set(vcmi_ICON "${CMAKE_CURRENT_BINARY_DIR}/VCMI_lib_versioninfo.rc")
-	configure_file("${CMAKE_SOURCE_DIR}/win/WindowsFileInfo.rc.in" "${vcmi_ICON}" @ONLY)
+	configure_file("${VCMI_SOURCE_DIR}/win/WindowsFileInfo.rc.in" "${vcmi_ICON}" @ONLY)
 	target_sources(vcmi PRIVATE ${vcmi_ICON})
 	set_target_properties(vcmi
 		PROPERTIES
@@ -932,8 +932,8 @@ if(COPY_CONFIG_ON_BUILD)
 	add_custom_command(TARGET vcmi POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/bin/${CMAKE_CFG_INTDIR}/config
 		COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/bin/${CMAKE_CFG_INTDIR}/Mods
-		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake_modules/create_link.cmake ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/${CMAKE_CFG_INTDIR}/config
-		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake_modules/create_link.cmake ${CMAKE_SOURCE_DIR}/Mods ${CMAKE_BINARY_DIR}/bin/${CMAKE_CFG_INTDIR}/Mods
+		COMMAND ${CMAKE_COMMAND} -P ${VCMI_SOURCE_DIR}/cmake_modules/create_link.cmake ${VCMI_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/${CMAKE_CFG_INTDIR}/config
+		COMMAND ${CMAKE_COMMAND} -P ${VCMI_SOURCE_DIR}/cmake_modules/create_link.cmake ${VCMI_SOURCE_DIR}/Mods ${CMAKE_BINARY_DIR}/bin/${CMAKE_CFG_INTDIR}/Mods
 	)
 endif()
 

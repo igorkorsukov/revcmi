@@ -132,8 +132,8 @@ if(ENABLE_MMAI_TEST)
 
   target_link_libraries(MMAI PUBLIC gtest gtest_main)
 
-  target_include_directories(MMAI PRIVATE "${CMAKE_SOURCE_DIR}/test/googletest/googletest/include")
-  add_subdirectory(${CMAKE_SOURCE_DIR}/test/googletest ${CMAKE_SOURCE_DIR}/test/googletest/build EXCLUDE_FROM_ALL)
+  target_include_directories(MMAI PRIVATE "${VCMI_SOURCE_DIR}/test/googletest/googletest/include")
+  add_subdirectory(${VCMI_SOURCE_DIR}/test/googletest ${VCMI_SOURCE_DIR}/test/googletest/build EXCLUDE_FROM_ALL)
   add_executable(MMAI_test test/encoder_test.cpp)
   target_link_libraries(MMAI_test PRIVATE MMAI)
   gtest_discover_tests(MMAI_test)
