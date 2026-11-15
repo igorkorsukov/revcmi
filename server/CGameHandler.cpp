@@ -2535,6 +2535,42 @@ bool CGameHandler::upgradeCreature(ObjectInstanceID objid, SlotID pos, CreatureI
 	return true;
 }
 
+bool CGameHandler::upgradeDwelling(ObjectInstanceID dwellingID, PlayerColor player)
+{
+	const auto * dwelling = dynamic_cast<const CGDwelling *>(gameInfo().getObj(dwellingID));
+
+	COMPLAIN_RET_FALSE_IF(!dwelling, "Cannot upgrade dwelling: invalid object!");
+	COMPLAIN_RET_FALSE_IF(dwelling->getOwner() != player, "Cannot upgrade dwelling: dwelling not owned!");
+	COMPLAIN_RET_FALSE_IF(dwelling->isUpgraded(), "Cannot upgrade dwelling: dwelling is already upgraded!");
+
+	const TResources upgradeCost = dwelling->getUpgradeCost();
+	COMPLAIN_RET_FALSE_IF(upgradeCost.empty(), "Cannot upgrade dwelling: dwelling has no upgrade!");
+
+	const std::vector<std::vector<CreatureID>> upgradedCreatures = dwelling->getUpgradedCreatures();
+	COMPLAIN_RET_FALSE_IF(upgradedCreatures.empty(), "Cannot upgrade dwelling: dwelling has no upgraded creatures!");
+
+	const PlayerState * p = gameInfo().getPlayerState(player);
+	COMPLAIN_RET_FALSE_IF(!p->resources.canAfford(upgradeCost), "Cannot upgrade dwelling: not enough resources!");
+
+	//take resources
+	giveResources(player, -upgradeCost);
+	statistics->getPlayerAccumulator(player).spentResourcesForBuildings += upgradeCost;
+
+	//switch dwelling to upgraded creatures, keeping already available amounts
+	SetDwellingUpgraded sdu;
+	sdu.tid = dwellingID;
+	sdu.creatures.resize(upgradedCreatures.size());
+
+	for (size_t level = 0; level < upgradedCreatures.size(); level++)
+	{
+		sdu.creatures[level].first = level < dwelling->creatures.size() ? dwelling->creatures[level].first : 0;
+		sdu.creatures[level].second = upgradedCreatures[level];
+	}
+
+	sendAndApply(sdu);
+	return true;
+}
+
 bool CGameHandler::changeStackType(const StackLocation &sl, const CCreature *c)
 {
 	const auto * obj = dynamic_cast<const CArmedInstance *>(gameInfo().getObjInstance(sl.army));

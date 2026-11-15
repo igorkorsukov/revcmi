@@ -18,13 +18,16 @@ VCMI_LIB_NAMESPACE_BEGIN
 
 class CGDwelling;
 
-class DwellingInstanceConstructor : public CDefaultObjectTypeHandler<CGDwelling>
+class DLL_LINKAGE DwellingInstanceConstructor : public CDefaultObjectTypeHandler<CGDwelling>
 {
 	std::vector<std::vector<const CCreature *>> availableCreatures;
 
 	JsonNode guards;
 	bool bannedForRandomDwelling = false;
 	AnimationPath kingdomOverviewImage;
+
+	/// Resources required to upgrade this dwelling. Empty if dwelling can not be upgraded
+	ResourceSet upgradeCost;
 
 protected:
 	bool objectFilter(const CGObjectInstance * obj, std::shared_ptr<const ObjectTemplate> tmpl) const override;
@@ -41,6 +44,11 @@ public:
 	bool producesCreature(const CCreature * crea) const;
 	std::vector<const CCreature *> getProducedCreatures() const;
 	AnimationPath getKingdomOverviewImage() const;
+
+	/// Returns resources required to upgrade this dwelling, or empty set if it can not be upgraded
+	const ResourceSet & getUpgradeCost() const;
+	/// Returns creatures produced by this dwelling after upgrade, indexed by dwelling level. Empty if upgrade is not possible
+	std::vector<std::vector<CreatureID>> getUpgradedCreatures() const;
 };
 
 VCMI_LIB_NAMESPACE_END

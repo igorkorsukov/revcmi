@@ -25,7 +25,16 @@
 	],
 
 	/// Image showed on kingdom overview (animation; only frame 0 displayed)
-	"kingdomOverviewImage" : "image.def"
+	"kingdomOverviewImage" : "image.def",
+
+	/// Optional upgrade of this dwelling. If defined, owning player can upgrade dwelling
+	/// by right-clicking it on adventure map, which will make dwelling produce upgraded creatures
+	/// Upgraded creatures are taken from creature upgrade graph, e.g. griffin -> royalGriffin
+	/// Creatures that have no upgrade will be kept as is
+	"upgrade" : {
+		/// Resources required to upgrade this dwelling. Can use any resource, including modded ones
+		"cost" : { "mithril" : 5 }
+	}
 }
 ```
 
@@ -69,3 +78,32 @@ Examples of valid dwellings:
       "BAV"
   ],
   ```
+
+## Dwelling upgrades
+
+Dwellings can be upgraded by their owner for a configurable amount of resources. This allows mods to implement mechanics such as "upgrade external dwelling for mithril".
+
+To make a dwelling upgradeable, provide an `upgrade` section with a `cost` object:
+
+```json
+{
+	"griffinTower" : {
+		"index" : 25,
+		"creatures" : [["griffin"]],
+		"upgrade" : {
+			"cost" : { "mithril" : 5 }
+		}
+	}
+}
+```
+
+Rules of this mechanic:
+
+- Upgraded creatures are resolved from the creature upgrade graph, so `griffin` becomes `royalGriffin`
+- If a dwelling provides several creatures on one level, all of them are upgraded
+- Creatures without an upgrade are kept as is, so dwellings like Golem Factory can also be upgraded
+- Any resource can be used in `cost`, including resources added by mods
+- Upgraded creatures share available amount with the base creatures - upgrading does not give extra units
+- Upgrading is permanent for the specific dwelling instance on the map and is stored in saved games
+- Only the owner of the dwelling can upgrade it, by right-clicking the dwelling on adventure map
+- The dwelling must have at least one creature that can actually be upgraded, otherwise `upgrade` has no effect

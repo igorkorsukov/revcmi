@@ -248,6 +248,11 @@ void SetAvailableCreatures::visitTyped(ICPackVisitor & visitor)
 	visitor.visitSetAvailableCreatures(*this);
 }
 
+void SetDwellingUpgraded::visitTyped(ICPackVisitor & visitor)
+{
+	visitor.visitSetDwellingUpgraded(*this);
+}
+
 void SetHeroesInTown::visitTyped(ICPackVisitor & visitor)
 {
 	visitor.visitSetHeroesInTown(*this);
@@ -606,6 +611,11 @@ void RecruitCreatures::visitTyped(ICPackVisitor & visitor)
 void UpgradeCreature::visitTyped(ICPackVisitor & visitor)
 {
 	visitor.visitUpgradeCreature(*this);
+}
+
+void UpgradeDwelling::visitTyped(ICPackVisitor & visitor)
+{
+	visitor.visitUpgradeDwelling(*this);
 }
 
 void GarrisonHeroSwap::visitTyped(ICPackVisitor & visitor)

@@ -18,6 +18,7 @@ class CGObjectInstance;
 class CGHeroInstance;
 class CGTownInstance;
 class CArmedInstance;
+class CGDwelling;
 class IShipyard;
 struct CGPathNode;
 struct ObjectPosInfo;
@@ -180,6 +181,9 @@ public:
 
 	/// called by MapView whenever tile is clicked
 	void onTileRightClicked(const int3 & mapPos);
+
+	/// shows dialog that allows player to upgrade owned dwelling, if dwelling supports upgrades
+	void showDwellingUpgradeDialog(const CGDwelling * dwelling);
 
 	/// called by spell window when spell to cast has been selected
 	void enterCastingMode(const CSpell * sp);

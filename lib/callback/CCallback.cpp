@@ -69,6 +69,17 @@ void CCallback::recruitCreatures(const CGDwelling * obj, const CArmedInstance * 
 	sendRequest(pack);
 }
 
+void CCallback::upgradeDwelling(const CGDwelling * dwelling)
+{
+	ASSERT_IF_CALLED_WITH_PLAYER
+
+	if (dwelling->getOwner() != *getPlayerID())
+		return;
+
+	UpgradeDwelling pack(dwelling->id);
+	sendRequest(pack);
+}
+
 bool CCallback::dismissCreature(const CArmedInstance *obj, SlotID stackPos)
 {
 	if((getPlayerID() && obj->tempOwner != getPlayerID()) || (obj->stacksCount()<2  && obj->needsLastStack()))

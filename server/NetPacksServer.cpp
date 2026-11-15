@@ -178,6 +178,15 @@ void ApplyGhNetPackVisitor::visitUpgradeCreature(UpgradeCreature & pack)
 	result = gh.upgradeCreature(pack.id, pack.pos, pack.cid);
 }
 
+void ApplyGhNetPackVisitor::visitUpgradeDwelling(UpgradeDwelling & pack)
+{
+	gh.throwIfWrongPlayer(connection, &pack);
+	gh.throwIfPlayerNotActive(connection, &pack);
+	// ownership checks are inside upgradeDwelling
+
+	result = gh.upgradeDwelling(pack.dwellingID, pack.player);
+}
+
 void ApplyGhNetPackVisitor::visitGarrisonHeroSwap(GarrisonHeroSwap & pack)
 {
 	const CGTownInstance * town = gh.gameInfo().getTown(pack.tid);

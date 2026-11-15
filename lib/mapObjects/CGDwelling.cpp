@@ -583,6 +583,39 @@ const IOwnableObject * CGDwelling::asOwnable() const
 	}
 }
 
+bool CGDwelling::isUpgraded() const
+{
+	return upgraded;
+}
+
+bool CGDwelling::canBeUpgraded() const
+{
+	if (upgraded)
+		return false;
+
+	return !getUpgradeCost().empty() && !getUpgradedCreatures().empty();
+}
+
+ResourceSet CGDwelling::getUpgradeCost() const
+{
+	const auto ourHandler = std::dynamic_pointer_cast<const DwellingInstanceConstructor>(getObjectHandler());
+
+	if (!ourHandler)
+		return {};
+
+	return ourHandler->getUpgradeCost();
+}
+
+std::vector<std::vector<CreatureID>> CGDwelling::getUpgradedCreatures() const
+{
+	const auto ourHandler = std::dynamic_pointer_cast<const DwellingInstanceConstructor>(getObjectHandler());
+
+	if (!ourHandler)
+		return {};
+
+	return ourHandler->getUpgradedCreatures();
+}
+
 ResourceSet CGDwelling::dailyIncome() const
 {
 	return {};

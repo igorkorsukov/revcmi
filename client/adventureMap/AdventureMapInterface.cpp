@@ -24,6 +24,7 @@
 #include "../mapView/mapHandler.h"
 #include "../mapView/MapView.h"
 #include "../windows/InfoWindows.h"
+#include "../widgets/CComponent.h"
 #include "../widgets/RadialMenu.h"
 #include "../gui/CursorHandler.h"
 #include "../GameEngine.h"
@@ -42,6 +43,9 @@
 #include "../../lib/IGameSettings.h"
 #include "../../lib/StartInfo.h"
 #include "../../lib/callback/CCallback.h"
+#include "../../lib/entities/ResourceTypeHandler.h"
+#include "../../lib/mapObjects/CGDwelling.h"
+#include "../../lib/mapObjectConstructors/AObjectTypeHandler.h"
 #include "../../lib/texts/CGeneralTextHandler.h"
 #include "../../lib/spells/CSpellHandler.h"
 #include "../../lib/mapObjects/CGHeroInstance.h"
@@ -823,7 +827,50 @@ void AdventureMapInterface::onTileRightClicked(const int3 &mapPos)
 		return;
 	}
 
+	// Dwelling that player owns can be upgraded via right-click dialog
+	if (const auto * dwelling = dynamic_cast<const CGDwelling *>(obj))
+	{
+		if (dwelling->canBeUpgraded() && dwelling->getOwner() == GAME->interface()->playerID && GAME->interface()->makingTurn)
+		{
+			showDwellingUpgradeDialog(dwelling);
+			return;
+		}
+	}
+
 	CRClickPopup::createAndPush(obj, ENGINE->getCursorPosition(), ETextAlignment::CENTER);
+}
+
+void AdventureMapInterface::showDwellingUpgradeDialog(const CGDwelling * dwelling)
+{
+	const TResources upgradeCost = dwelling->getUpgradeCost();
+
+	std::vector<std::shared_ptr<CComponent>> components;
+	for (GameResID resource : LIBRARY->resourceTypeHandler->getAllObjects())
+	{
+		if (upgradeCost[resource] > 0)
+			components.push_back(std::make_shared<CComponent>(ComponentType::RESOURCE, resource, upgradeCost[resource], CComponent::ESize::medium));
+	}
+
+	MetaString text;
+	text.appendTextID("vcmi.adventureMap.dwellingUpgrade");
+	text.replaceTextID(dwelling->getObjectHandler()->getNameTextID());
+
+	const bool canAfford = GAME->interface()->cb->getResourceAmount().canAfford(upgradeCost);
+
+	if (canAfford)
+	{
+		CFunctionList<void()> onYes = [dwelling](){ GAME->interface()->cb->upgradeDwelling(dwelling); };
+		GAME->interface()->showYesNoDialog(text.toString(), onYes, nullptr, components);
+	}
+	else
+	{
+		// Show the same cost breakdown, but with explanation that upgrade can not be afforded
+		MetaString notEnoughText;
+		notEnoughText.appendTextID("vcmi.adventureMap.dwellingUpgradeNoResources");
+		notEnoughText.replaceTextID(dwelling->getObjectHandler()->getNameTextID());
+
+		GAME->interface()->showInfoDialog(notEnoughText.toString(), components);
+	}
 }
 
 void AdventureMapInterface::enterCastingMode(const CSpell * sp)
