@@ -1,9 +1,12 @@
 # Build directories of the top-level wrapper project (see CMakePresets.json)
-/build/
-/build-*/
+build/
 
 # CMake user-specific files
-/CMakeUserPresets.json
-CMakeCache.txt
-CMakeFiles/
+CMakeUserPresets.json
 compile_commands.json
+
+# Local editor configuration; the tracked template is .vscode_template
+.vscode/
+
+# clangd index cache
+.cache/

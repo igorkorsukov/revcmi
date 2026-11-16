@@ -7,4 +7,17 @@ project(revcmi)
 # the top-level directory of the whole build tree.
 set(VCMI_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vcmi")
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(CMAKE_EXPORT_COMPILE_COMMANDS)
+	file(CREATE_LINK
+		"${CMAKE_BINARY_DIR}/compile_commands.json"
+		"${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json"
+		SYMBOLIC
+		COPY_ON_ERROR
+	)
+endif()
+
 add_subdirectory(vcmi)
+
+include_directories(${VCMI_SOURCE_DIR})
+add_subdirectory(src/client)
