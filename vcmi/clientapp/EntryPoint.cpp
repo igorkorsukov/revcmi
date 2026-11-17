@@ -64,6 +64,9 @@ namespace po_style = boost::program_options::command_line_style;
 static std::atomic<bool> headlessQuit = false;
 static std::optional<std::string> criticalInitializationError;
 
+static CConsoleHandler* console = nullptr;
+static CBasicLogConfigurator* logConfigurator = nullptr;
+
 static void init()
 {
 	try
@@ -117,7 +120,7 @@ static void prog_help(const po::options_description &opts)
 	std::cout << opts;
 }
 
-int vcmiclientMain(int argc, char * argv[])
+InitCode init_vcmi(int argc, char * argv[])
 {
 #ifdef VCMI_ANDROID
 	CAndroidVMHelper::initClassloader(SDL_AndroidGetJNIEnv());
@@ -175,7 +178,7 @@ int vcmiclientMain(int argc, char * argv[])
 #ifdef VCMI_IOS
 		exit(0);
 #else
-		return 0;
+		return InitCode::Quit;
 #endif
 	}
 	if(vm.count("version"))
@@ -184,7 +187,7 @@ int vcmiclientMain(int argc, char * argv[])
 #ifdef VCMI_IOS
 		exit(0);
 #else
-		return 0;
+		return InitCode::Quit;
 #endif
 	}
 
@@ -206,15 +209,15 @@ int vcmiclientMain(int argc, char * argv[])
 		commandController.processCommand(buffer, calledFromIngameConsole);
 	};
 
-	CConsoleHandler console(callbackFunction);
-	console.start();
+	console = new CConsoleHandler(callbackFunction);
+	console->start();
 
-	CBasicLogConfigurator logConfigurator(logPath, &console);
+	logConfigurator = new CBasicLogConfigurator(logPath, console);
 #else
-	CBasicLogConfigurator logConfigurator(logPath, nullptr);
+	logConfigurator = new CBasicLogConfigurator(logPath, nullptr);
 #endif
 
-	logConfigurator.configureDefault();
+	logConfigurator->configureDefault();
 	logGlobal->info("Starting client of '%s'", GameConstants::VCMI_VERSION);
 	logGlobal->info("Creating console and configuring logger: %d ms", pomtime.getDiff());
 	logGlobal->info("The log file will be saved to %s", logPath);
@@ -272,7 +275,7 @@ int vcmiclientMain(int argc, char * argv[])
 	setSettingInteger("general/saveFrequency", "savefrequency", 1);
 
 	// Initialize logging based on settings
-	logConfigurator.configure();
+	logConfigurator->configure();
 	logGlobal->debug("settings = %s", settings.toJsonNode().toString());
 
 	try
@@ -375,72 +378,75 @@ int vcmiclientMain(int argc, char * argv[])
 		setThreadName("MainGUI");
 #endif
 
-		const auto & runMainLoop = []()
-		{
-			try
-			{
-				if (ENGINE)
-				{
-					checkForModLoadingFailure();
-					ENGINE->mainLoop();
-				}
-				else
-				{
-					while(!headlessQuit)
-						std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-					std::this_thread::sleep_for(std::chrono::milliseconds(500));
-				}
-			}
-			catch (const GameShutdownException & )
-			{
-				// no-op - just break out of main loop
-				logGlobal->info("Main loop termination requested");
-			}
-		};
-
-		const auto & cleanupEngine = [&logConfigurator]()
-		{
-			GAME->server().endNetwork();
-
-			if(!settings["session"]["headless"].Bool())
-			{
-				if(GAME->server().client)
-					GAME->server().endGameplay();
-
-				if (ENGINE)
-					ENGINE->windows().clear();
-			}
-
-			GAME.reset();
-
-			if(!settings["session"]["headless"].Bool())
-			{
-				CMessage::dispose();
-				delete graphics;
-				graphics = nullptr;
-			}
-
-			// must be executed before reset - since unique_ptr resets pointer to null before calling destructor
-			ENGINE->async().wait();
-
-			ENGINE.reset();
-
-			delete LIBRARY;
-			LIBRARY = nullptr;
-			logConfigurator.deconfigure();
-
-			std::cout << "Ending...\n";
-		};
-
-		auto onExit = vstd::makeScopeGuard(cleanupEngine);
-		runMainLoop();
+		checkForModLoadingFailure();
 	}
 	catch (const GameShutdownException &)
 	{
 		logGlobal->info("Shutdown requested during initialization");
 	}
-	return 0;
+	return InitCode::Continue;
+}
+
+void run_vcmi()
+{
+	try
+	{
+		if (ENGINE)
+		{
+			
+			ENGINE->mainLoop();
+		}
+		else
+		{
+			while(!headlessQuit)
+				std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		}
+	}
+	catch (const GameShutdownException & )
+	{
+		// no-op - just break out of main loop
+		logGlobal->info("Main loop termination requested");
+	}
+}
+
+void deinit_vcmi()
+{
+	GAME->server().endNetwork();
+
+	if(!settings["session"]["headless"].Bool())
+	{
+		if(GAME->server().client)
+			GAME->server().endGameplay();
+
+		if (ENGINE)
+			ENGINE->windows().clear();
+	}
+
+	GAME.reset();
+
+	if(!settings["session"]["headless"].Bool())
+	{
+		CMessage::dispose();
+		delete graphics;
+		graphics = nullptr;
+	}
+
+	// must be executed before reset - since unique_ptr resets pointer to null before calling destructor
+	ENGINE->async().wait();
+
+	ENGINE.reset();
+
+	delete LIBRARY;
+	LIBRARY = nullptr;
+	logConfigurator->deconfigure();
+	delete logConfigurator;
+	logConfigurator = nullptr;
+	delete console;
+	console = nullptr;
+
+	std::cout << "Ending...\n";
 }
 
 /// Notify user about encountered fatal error and terminate the game

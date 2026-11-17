@@ -116,13 +116,20 @@ void GameEngine::fakeMouseMove()
 	for (;;)
 	{
 		input().fetchEvents();
-		updateFrame();
+		doUpdateFrame();
 		screenHandlerInstance->presentScreenTexture();
 		framerate().framerateDelay(); // holds a constant FPS
 	}
 }
 
 void GameEngine::updateFrame()
+{
+	doUpdateFrame();
+	screenHandlerInstance->presentScreenTexture();
+	framerate().framerateDelay(); // holds a constant FPS
+}
+
+void GameEngine::doUpdateFrame()
 {
 	std::scoped_lock interfaceLock(ENGINE->interfaceMutex);
 

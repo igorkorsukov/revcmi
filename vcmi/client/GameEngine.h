@@ -62,7 +62,7 @@ private:
 
 	int maxPerformanceOverlayTextWidth = 0;
 
-	void updateFrame();
+	void doUpdateFrame();
 	void handleEvents(); //takes events from queue and calls interested objects
 	void drawPerformanceOverlay(); // draws box with additional infos (e.g. fps)
 
@@ -124,6 +124,7 @@ public:
 	/// Performs main game loop till game shutdown
 	/// This method never returns, to abort main loop throw GameShutdownException
 	[[noreturn]] void mainLoop();
+	void updateFrame();
 
 	/// called whenever SDL_WINDOWEVENT_RESTORED is reported or the user selects a different resolution, requiring to center/resize all windows
 	void onScreenResize(bool resolutionChanged, bool windowResized);

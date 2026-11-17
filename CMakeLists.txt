@@ -19,5 +19,9 @@ endif()
 
 add_subdirectory(vcmi)
 
-include_directories(${VCMI_SOURCE_DIR})
+include_directories(
+	${VCMI_SOURCE_DIR}
+	${VCMI_SOURCE_DIR}/include 
+	)
+
 add_subdirectory(src/client)

@@ -9,10 +9,13 @@
  */
 #pragma once
 
-/// Entry point of the VCMI client.
-/// Contains the whole initialization sequence of the client originally implemented
-/// directly in main(). The process entry point itself lives in a separate executable
-/// (see src/client/main.cpp), which only forwards its arguments here.
-///
-/// Returns the process exit code.
-int vcmiclientMain(int argc, char * argv[]);
+#include <cstdint>
+
+enum class InitCode : std::uint8_t {
+    Quit,
+    Continue,
+};
+
+InitCode init_vcmi(int argc, char * argv[]);
+void run_vcmi();
+void deinit_vcmi();
