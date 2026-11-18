@@ -13,10 +13,7 @@
 #include "../render/EFont.h"
 #include "../../lib/FunctionList.h"
 #include "../../lib/filesystem/ResourcePath.h"
-
-VCMI_LIB_NAMESPACE_BEGIN
-class Rect;
-VCMI_LIB_NAMESPACE_END
+#include "../../lib/Rect.h"
 
 class CAnimImage;
 class InterfaceObjectConfigurable;

@@ -9,14 +9,15 @@
  */
 #pragma once
 
+#include "../../lib/Color.h"
+#include "../../lib/Point.h"
+
 VCMI_LIB_NAMESPACE_BEGIN
 
 class int3;
-class Point;
 class CGObjectInstance;
 class ObjectInstanceID;
 struct TerrainTile;
-class ColorRGBA;
 struct CGPath;
 
 VCMI_LIB_NAMESPACE_END

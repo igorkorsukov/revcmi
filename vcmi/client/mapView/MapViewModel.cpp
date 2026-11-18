@@ -80,7 +80,7 @@ Point MapViewModel::getTilesVisibleDimensions() const
 Rect MapViewModel::getTilesTotalRect() const
 {
 	return Rect(
-		Point(getTileAtPoint(Point(0,0))),
+		toPoint(getTileAtPoint(Point(0,0))),
 		getTilesVisibleDimensions()
 	);
 }
@@ -122,7 +122,7 @@ Rect MapViewModel::getCacheTileArea(const int3 & coordinates) const
 Rect MapViewModel::getTargetTileArea(const int3 & coordinates) const
 {
 	Point topLeftOffset = getMapViewCenter() - getPixelsVisibleDimensions() / 2;
-	Point tilePosAbsolute = Point(coordinates) * getSingleTileSize();
+	Point tilePosAbsolute = toPoint(coordinates) * getSingleTileSize();
 	Point tilePosRelative = tilePosAbsolute - topLeftOffset;
 
 	return Rect(tilePosRelative, getSingleTileSize());

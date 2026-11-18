@@ -9,6 +9,8 @@
  */
 #pragma once
 
+#include "Point.h"
+
 VCMI_LIB_NAMESPACE_BEGIN
 
 /// Class which consists of three integer values. Represents position on adventure map.
@@ -190,6 +192,11 @@ public:
         return ((hx * 4000037u) ^ (hy * 2003u)) + hz;
     }
 };
+
+inline Point toPoint(const int3 & pos)
+{
+	return Point(pos.x, pos.y);
+}
 
 template<typename Container>
 int3 findClosestTile (Container & container, int3 dest)

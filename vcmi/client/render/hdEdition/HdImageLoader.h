@@ -14,9 +14,9 @@
 
 #include "../../../lib/constants/EntityIdentifiers.h"
 #include "../../../lib/filesystem/ResourcePath.h"
+#include "../../../lib/Point.h"
 
 VCMI_LIB_NAMESPACE_BEGIN
-class Point;
 class PlayerColor;
 VCMI_LIB_NAMESPACE_END
 

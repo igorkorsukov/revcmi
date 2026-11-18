@@ -10,9 +10,10 @@
 #pragma once
 
 #include "../gui/CIntObject.h"
+#include "../../lib/Color.h"
+#include "../../lib/int3.h"
 
 VCMI_LIB_NAMESPACE_BEGIN
-class ColorRGBA;
 using FowTilesType = std::set<int3>;
 VCMI_LIB_NAMESPACE_END
 

@@ -11,10 +11,7 @@
 
 #include "../../lib/vcmi_endian.h"
 #include "../../lib/filesystem/ResourcePath.h"
-
-VCMI_LIB_NAMESPACE_BEGIN
-class Point;
-VCMI_LIB_NAMESPACE_END
+#include "../../lib/Point.h"
 
 class IImageLoader;
 struct SDL_Color;

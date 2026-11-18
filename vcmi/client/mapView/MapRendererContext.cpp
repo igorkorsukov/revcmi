@@ -137,7 +137,7 @@ Point MapRendererBaseContext::objectImageOffset(ObjectInstanceID objectID, const
 {
 	const CGObjectInstance * object = getObject(objectID);
 	int3 offsetTiles(object->anchorPos() - coordinates);
-	return Point(offsetTiles) * Point(32, 32);
+	return toPoint(offsetTiles) * Point(32, 32);
 }
 
 double MapRendererBaseContext::objectTransparency(ObjectInstanceID objectID, const int3 & coordinates) const
@@ -458,8 +458,8 @@ Point MapRendererAdventureMovingContext::objectImageOffset(ObjectInstanceID obje
 		int3 offsetTilesFrom = tileFrom - coordinates;
 		int3 offsetTilesDest = tileDest - coordinates;
 
-		Point offsetPixelsFrom = Point(offsetTilesFrom) * Point(32, 32);
-		Point offsetPixelsDest = Point(offsetTilesDest) * Point(32, 32);
+		Point offsetPixelsFrom = toPoint(offsetTilesFrom) * Point(32, 32);
+		Point offsetPixelsDest = toPoint(offsetTilesDest) * Point(32, 32);
 
 		Point result = vstd::lerp(offsetPixelsFrom, offsetPixelsDest, progress);
 

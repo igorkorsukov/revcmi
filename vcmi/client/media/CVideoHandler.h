@@ -25,7 +25,6 @@ struct AVIOContext;
 
 VCMI_LIB_NAMESPACE_BEGIN
 class CInputStream;
-class Point;
 VCMI_LIB_NAMESPACE_END
 
 class FFMpegStream : boost::noncopyable

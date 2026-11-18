@@ -41,6 +41,7 @@ class CBaseForLobbyApply;
 class GlobalLobbyClient;
 class GameChatHandler;
 class IServerRunner;
+class Discord;
 
 enum class ESelectionScreen : ui8;
 enum class ELoadMode : ui8;
@@ -108,6 +109,7 @@ class CServerHandler final : public IServerAPI, public LobbyInfo, public INetwor
 	std::unique_ptr<NetworkLagCompensator> networkLagCompensator;
 	std::shared_ptr<CMapInfo> mapToStart;
 	std::vector<std::string> localPlayerNames;
+	std::unique_ptr<Discord> discordInstance;
 
 	std::thread threadNetwork;
 

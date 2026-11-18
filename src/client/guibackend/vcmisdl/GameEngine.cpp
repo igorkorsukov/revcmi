@@ -9,8 +9,6 @@
  */
 #include "StdInc.h"
 #include "GameEngine.h"
-#include "GameLibrary.h"
-#include "Discord.h"
 
 #include "gui/CIntObject.h"
 #include "gui/CursorHandler.h"
@@ -72,8 +70,6 @@ GameEngine::GameEngine()
 	shortcutsHandlerInstance = std::make_unique<ShortcutHandler>();
 	inputHandlerInstance = std::make_unique<InputHandler>(); // Must be after windowHandlerInstance and shortcutsHandlerInstance
 	framerateManagerInstance = std::make_unique<FramerateManager>(settings["video"]["targetfps"].Integer());
-
-	discordInstance = std::make_unique<Discord>();
 
 #ifndef ENABLE_VIDEO
 	videoPlayerInstance = std::make_unique<CEmptyVideoPlayer>();
@@ -207,9 +203,9 @@ void GameEngine::drawPerformanceOverlay()
 	auto powerState = ENGINE->input().getPowerState();
 	std::string powerSymbol = ""; // add symbol if emoji are supported (e.g. VCMI extras)
 	if(powerState.powerState == PowerStateMode::ON_BATTERY)
-		powerSymbol = fontPtr->canRepresentCharacter("🔋") ? "🔋 " : (LIBRARY->generaltexth->translate("vcmi.overlay.battery") + " ");
+		powerSymbol = fontPtr->canRepresentCharacter("🔋") ? "🔋 " : "battery ";
 	else if(powerState.powerState == PowerStateMode::CHARGING)
-		powerSymbol = fontPtr->canRepresentCharacter("🔌") ? "🔌 " : (LIBRARY->generaltexth->translate("vcmi.overlay.charging") + " ");
+		powerSymbol = fontPtr->canRepresentCharacter("🔌") ? "🔌 " : "charging ";
 
 	std::string fps = std::to_string(framerate().getFramerate())+" FPS";
 	std::string time = TextOperations::getFormattedTimeLocal(std::time(nullptr));

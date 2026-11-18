@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../../lib/Color.h"
+#include "../../lib/Point.h"
 
 VCMI_LIB_NAMESPACE_BEGIN
 
@@ -19,7 +20,6 @@ class BattleAction;
 class CStack;
 class CSpell;
 class SpellID;
-class Point;
 
 VCMI_LIB_NAMESPACE_END
 

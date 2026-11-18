@@ -11,10 +11,6 @@
 
 #include "../gui/CIntObject.h"
 
-VCMI_LIB_NAMESPACE_BEGIN
-class Rect;
-VCMI_LIB_NAMESPACE_END
-
 class CAnimImage;
 class CSlider;
 class CLabel;

@@ -17,6 +17,7 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
 	)
 endif()
 
+add_subdirectory(src/geometry)
 add_subdirectory(vcmi)
 
 include_directories(

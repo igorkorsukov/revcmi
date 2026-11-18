@@ -206,7 +206,7 @@ set(vcmiclientcommon_SRCS
 	xBRZ/xbrz.cpp
 
 	ArtifactsUIController.cpp
-	GameEngine.cpp
+	#GameEngine.cpp
 	GameInstance.cpp
 	CPlayerInterface.cpp
 	PlayerLocalState.cpp

@@ -10,13 +10,12 @@
 #pragma once
 
 #include "../../lib/filesystem/ResourcePath.h"
+#include "../../lib/Color.h"
+#include "../../lib/Rect.h"
 
 VCMI_LIB_NAMESPACE_BEGIN
 
 class PlayerColor;
-class Rect;
-class Point;
-class ColorRGBA;
 
 VCMI_LIB_NAMESPACE_END
 

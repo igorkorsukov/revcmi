@@ -12,6 +12,7 @@
 #include "../../lib/battle/BattleHexArray.h"
 #include "../../lib/filesystem/ResourcePath.h"
 #include "../../lib/Color.h"
+#include "../../lib/Point.h"
 #include "BattleConstants.h"
 
 VCMI_LIB_NAMESPACE_BEGIN
@@ -19,7 +20,6 @@ VCMI_LIB_NAMESPACE_BEGIN
 class CStack;
 class CCreature;
 class CSpell;
-class Point;
 
 VCMI_LIB_NAMESPACE_END
 

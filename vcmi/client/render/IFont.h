@@ -9,10 +9,8 @@
  */
 #pragma once
 
-VCMI_LIB_NAMESPACE_BEGIN
-class Point;
-class ColorRGBA;
-VCMI_LIB_NAMESPACE_END
+#include "../../lib/Color.h"
+#include "../../lib/Point.h"
 
 struct SDL_Surface;
 

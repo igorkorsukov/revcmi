@@ -567,6 +567,22 @@ if (ENABLE_CLIENT)
 		add_library(SDL2::TTF ALIAS SDL2_ttf::SDL2_ttf-static)
 	endif()
 
+	# Imported targets are visible only in this directory. src/client is a sibling
+	# of vcmi/, so promote them before guibackend can link SDL2 and see SDL_mixer.h.
+	foreach(_sdl_target SDL2::SDL2 SDL2::Image SDL2::Mixer SDL2::TTF)
+		if(NOT TARGET ${_sdl_target})
+			continue()
+		endif()
+		get_target_property(_sdl_aliased ${_sdl_target} ALIASED_TARGET)
+		if(_sdl_aliased)
+			set_target_properties(${_sdl_aliased} PROPERTIES IMPORTED_GLOBAL TRUE)
+		else()
+			set_target_properties(${_sdl_target} PROPERTIES IMPORTED_GLOBAL TRUE)
+		endif()
+	endforeach()
+	unset(_sdl_target)
+	unset(_sdl_aliased)
+
 	find_package(libsquish REQUIRED)
 endif()
 

@@ -112,6 +112,7 @@ CServerHandler::CServerHandler()
 	, hotseatMode(false)
 	, battleMode(false)
 	, client(nullptr)
+	, discordInstance(std::make_unique<Discord>())
 {
 	uuid = boost::uuids::to_string(boost::uuids::random_generator()());
 }
@@ -672,7 +673,7 @@ void CServerHandler::startGameplay(std::shared_ptr<CGameState> gameState)
 		throw std::runtime_error("Invalid mode");
 	}
 
-	ENGINE->discord().setPlayingStatus(si, &gameState->getMap(), howManyPlayerInterfaces());
+	discordInstance->setPlayingStatus(si, &gameState->getMap(), howManyPlayerInterfaces());
 
 	// After everything initialized we can accept CPackToClient netpacks
 	setState(EClientState::GAMEPLAY);
@@ -718,7 +719,7 @@ void CServerHandler::endGameplay()
 		GAME->mainmenu()->makeActiveInterface();
 	}
 
-	ENGINE->discord().setStatus("", "", {0, 0});
+	discordInstance->setStatus("", "", {0, 0});
 }
 
 std::optional<std::string> CServerHandler::canQuickLoadGame(const std::string & path) const

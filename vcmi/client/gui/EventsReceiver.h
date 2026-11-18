@@ -9,10 +9,7 @@
  */
 #pragma once
 
-VCMI_LIB_NAMESPACE_BEGIN
-class Point;
-class Rect;
-VCMI_LIB_NAMESPACE_END
+#include "../../lib/Rect.h"
 
 class EventDispatcher;
 enum class EShortcut;

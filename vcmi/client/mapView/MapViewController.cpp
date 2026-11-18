@@ -34,12 +34,12 @@
 
 void MapViewController::setViewCenter(const int3 & position)
 {
-	setViewCenter(Point(position) * model->getSingleTileSize() + model->getSingleTileSize() / 2, position.z);
+	setViewCenter(toPoint(position) * model->getSingleTileSize() + model->getSingleTileSize() / 2, position.z);
 }
 
 void MapViewController::setViewCenter(const Point & position, int level)
 {
-	Point upperLimit = Point(context->getMapSize()) * model->getSingleTileSize();
+	Point upperLimit = toPoint(context->getMapSize()) * model->getSingleTileSize();
 	Point lowerLimit = Point(0, 0);
 
 	if(worldViewContext)
@@ -191,8 +191,8 @@ void MapViewController::tick(uint32_t timeDelta)
 		movementContext->progress += timeDelta / heroMoveTime;
 		movementContext->progress = std::min( 1.0, movementContext->progress);
 
-		Point positionFrom = Point(hero->convertToVisitablePos(movementContext->tileFrom)) * model->getSingleTileSize() + model->getSingleTileSize() / 2;
-		Point positionDest = Point(hero->convertToVisitablePos(movementContext->tileDest)) * model->getSingleTileSize() + model->getSingleTileSize() / 2;
+		Point positionFrom = toPoint(hero->convertToVisitablePos(movementContext->tileFrom)) * model->getSingleTileSize() + model->getSingleTileSize() / 2;
+		Point positionDest = toPoint(hero->convertToVisitablePos(movementContext->tileDest)) * model->getSingleTileSize() + model->getSingleTileSize() / 2;
 
 		Point positionCurr = vstd::lerp(positionFrom, positionDest, movementContext->progress);
 
